@@ -111,3 +111,8 @@ def get_supported_formats():
     return [
         "MP4", "MP3", "GIF", "AVI", "MOV", "WAV", "FLV", "MKV", "WEBM", "AAC", "OGG"
     ]
+
+# Setting up the GUI
+root = tk.Tk()
+root.title("Advanced File Converter")  # Set window title
+root.geometry("450x550")  # Set window size

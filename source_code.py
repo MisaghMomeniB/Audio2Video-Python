@@ -135,3 +135,7 @@ tk.Label(root, text="Save Path:").pack(pady=5)
 output_entry = tk.Entry(root, width=50)  # Entry for output file path
 output_entry.pack(pady=5)
 tk.Button(root, text="Choose Save Path", command=select_save_path).pack(pady=5)  # Button to choose save path
+
+# Convert button
+convert_button = tk.Button(root, text="Convert", command=start_conversion, bg="green", fg="white")  # Convert button
+convert_button.pack(pady=20)

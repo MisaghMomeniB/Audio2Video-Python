@@ -60,3 +60,15 @@ def select_file():
     if file_path:
         input_entry.delete(0, tk.END)  # Clear the entry field
         input_entry.insert(0, file_path)  # Insert the selected file path
+
+# Function to select a save path for the output file
+def select_save_path():
+    output_format = format_var.get().lower()  # Get the selected format
+    save_path = filedialog.asksaveasfilename(
+        title="Select Save Path",
+        defaultextension=f".{output_format}",
+        filetypes=[(f"{output_format.upper()} files", f"*.{output_format}")]
+    )
+    if save_path:
+        output_entry.delete(0, tk.END)  # Clear the entry field
+        output_entry.insert(0, save_path)  # Insert the selected save path

@@ -129,3 +129,9 @@ format_var = tk.StringVar(value="MP4")  # Default format
 output_formats = get_supported_formats()  # Get supported formats
 format_menu = tk.OptionMenu(root, format_var, *output_formats)  # Dropdown for output formats
 format_menu.pack(pady=5)
+
+# Output file save path
+tk.Label(root, text="Save Path:").pack(pady=5)
+output_entry = tk.Entry(root, width=50)  # Entry for output file path
+output_entry.pack(pady=5)
+tk.Button(root, text="Choose Save Path", command=select_save_path).pack(pady=5)  # Button to choose save path

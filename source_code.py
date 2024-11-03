@@ -143,3 +143,9 @@ convert_button.pack(pady=20)
 # Cancel button
 cancel_button = tk.Button(root, text="Cancel", command=cancel_conversion, bg="red", fg="white", state=tk.DISABLED)  # Cancel button
 cancel_button.pack(pady=5)
+
+# Progress bar
+progress_bar = ttk.Progressbar(root, mode="indeterminate", length=300)  # Progress bar
+progress_bar.pack(pady=10)
+progress_label = tk.Label(root, text="")  # Label for progress messages
+progress_label.pack(pady=5)

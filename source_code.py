@@ -149,3 +149,10 @@ progress_bar = ttk.Progressbar(root, mode="indeterminate", length=300)  # Progre
 progress_bar.pack(pady=10)
 progress_label = tk.Label(root, text="")  # Label for progress messages
 progress_label.pack(pady=5)
+
+# Exit button
+exit_button = tk.Button(root, text="Exit", command=exit_application, bg="gray", fg="white")  # Exit button
+exit_button.pack(pady=20)
+
+# Start the Tkinter event loop
+root.mainloop()

@@ -94,3 +94,20 @@ def start_conversion():
     # Create a thread for file conversion
     conversion_thread = threading.Thread(target=convert_file, args=(input_path, output_path))
     conversion_thread.start()  # Start the conversion thread
+
+# Function to cancel the ongoing conversion
+def cancel_conversion():
+    global cancel_flag
+    cancel_flag = True  # Set the cancel flag to true
+
+# Function to exit the application
+def exit_application():
+    root.quit()  # Quit the main loop
+    root.destroy()  # Destroy the root window
+
+# Function to retrieve supported formats from ffmpeg
+def get_supported_formats():
+    # List of supported formats (can be extended)
+    return [
+        "MP4", "MP3", "GIF", "AVI", "MOV", "WAV", "FLV", "MKV", "WEBM", "AAC", "OGG"
+    ]

@@ -72,3 +72,25 @@ def select_save_path():
     if save_path:
         output_entry.delete(0, tk.END)  # Clear the entry field
         output_entry.insert(0, save_path)  # Insert the selected save path
+
+# Function to start the conversion process in a new thread
+def start_conversion():
+    global cancel_flag, conversion_thread
+    input_path = input_entry.get()  # Get input file path
+    output_path = output_entry.get()  # Get output file path
+
+    # Validate input and output paths
+    if not input_path or not output_path:
+        messagebox.showwarning("Warning", "Please specify both input and output paths.")
+        return
+
+    if not os.path.exists(input_path):
+        messagebox.showerror("Error", "Input file not found.")
+        return
+
+    cancel_flag = False  # Reset the cancel flag
+    progress_bar.start()  # Start the progress bar
+
+    # Create a thread for file conversion
+    conversion_thread = threading.Thread(target=convert_file, args=(input_path, output_path))
+    conversion_thread.start()  # Start the conversion thread

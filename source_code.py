@@ -139,3 +139,7 @@ tk.Button(root, text="Choose Save Path", command=select_save_path).pack(pady=5) 
 # Convert button
 convert_button = tk.Button(root, text="Convert", command=start_conversion, bg="green", fg="white")  # Convert button
 convert_button.pack(pady=20)
+
+# Cancel button
+cancel_button = tk.Button(root, text="Cancel", command=cancel_conversion, bg="red", fg="white", state=tk.DISABLED)  # Cancel button
+cancel_button.pack(pady=5)

@@ -50,3 +50,13 @@ def convert_file(input_path, output_path):
         cancel_button.config(state=tk.DISABLED)  # Disable the cancel button
         progress_bar.stop()  # Stop the progress bar
         progress_label.config(text="")  # Clear the status message
+
+# Function to select an input file
+def select_file():
+    file_path = filedialog.askopenfilename(
+        title="Select File",
+        filetypes=[("All Files", "*.*")]
+    )
+    if file_path:
+        input_entry.delete(0, tk.END)  # Clear the entry field
+        input_entry.insert(0, file_path)  # Insert the selected file path

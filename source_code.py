@@ -116,3 +116,16 @@ def get_supported_formats():
 root = tk.Tk()
 root.title("Advanced File Converter")  # Set window title
 root.geometry("450x550")  # Set window size
+
+# Input file selection
+tk.Label(root, text="Select Input File:").pack(pady=5)
+input_entry = tk.Entry(root, width=50)  # Entry for input file path
+input_entry.pack(pady=5)
+tk.Button(root, text="Choose File", command=select_file).pack(pady=5)  # Button to choose file
+
+# Output format selection
+tk.Label(root, text="Select Output Format:").pack(pady=5)
+format_var = tk.StringVar(value="MP4")  # Default format
+output_formats = get_supported_formats()  # Get supported formats
+format_menu = tk.OptionMenu(root, format_var, *output_formats)  # Dropdown for output formats
+format_menu.pack(pady=5)

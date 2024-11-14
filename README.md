@@ -1,18 +1,4 @@
-__Hello My Friend 👋🏻__ <br>
-__I'm Misagh and I'm Glad You're Here 😉__
-
-# Audio2Video-Python🐍
-I Wrote a Program in __Python__ That Can Convert Audio Files to ***Video*** and ***Video*** Files to Audio.
-
-# Does It Require Any Installation Steps or Prerequisites?
-`` pip install ffmpeg-python `` <br>
-`` sudo apt-get install python3-tk `` <br>
-`` sudo apt-get install ffmpeg `` <br>
-
-# Line by Line Code Analysis
-
-### Import Statements:
-
+### Import Statements
 ```python
 import os
 import threading
@@ -20,206 +6,205 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import ffmpeg
 ```
+These lines import required modules:
+- `os` for file and path operations.
+- `threading` to run tasks in parallel, specifically the conversion in a separate thread.
+- `tkinter` and specific components (`filedialog`, `messagebox`, `ttk`) for creating the GUI.
+- `ffmpeg`, a library for managing the FFmpeg conversion process.
 
-- **os**: Provides functions to interact with the operating system, like checking file existence or managing file paths.
-- **threading**: Allows running tasks asynchronously in the background to prevent blocking the main UI thread (important for long-running tasks like file conversions).
-- **tkinter**: A GUI (Graphical User Interface) library in Python for creating windows, buttons, labels, and other interactive elements.
-- **filedialog, messagebox, ttk**: These are specific submodules from `tkinter`. 
-  - `filedialog`: Used to open file dialogs for selecting files and folders.
-  - `messagebox`: Used to show pop-up dialogs for information, warnings, or errors.
-  - `ttk`: Provides themed widgets like progress bars.
-- **ffmpeg**: A powerful library for multimedia processing (converting audio and video files).
-
----
-
-### Global Variables:
-
+### Global Variables
 ```python
-conversion_thread = None  # To hold the reference to the thread running the conversion
-cancel_flag = False  # A flag to indicate if the conversion is cancelled
+conversion_thread = None
+cancel_flag = False
 ```
+Defines global variables:
+- `conversion_thread` will reference the thread handling file conversion.
+- `cancel_flag` is a boolean that will be set to `True` when the user requests to cancel the conversion.
 
-- `conversion_thread`: Holds the reference to the thread that handles the conversion, allowing you to manage it later (e.g., cancel the process).
-- `cancel_flag`: A flag to indicate whether the conversion process should be stopped (set to `True` if cancellation is requested).
-
----
-
-### Helper Function to Update UI:
-
+### Helper Function to Update the UI
 ```python
 def update_ui(label_text, progress_step, cancel_state):
-    progress_label.config(text=label_text)  # Update the progress label with new text
-    progress_bar.step(progress_step)  # Update the progress bar by a certain step
-    cancel_button.config(state=cancel_state)  # Update the cancel button state (enabled/disabled)
-    root.update_idletasks()  # Update the UI without blocking the main loop
+    progress_label.config(text=label_text)
+    progress_bar.step(progress_step)
+    cancel_button.config(state=cancel_state)
+    root.update_idletasks()
 ```
+The `update_ui` function updates the UI elements:
+- Changes `progress_label` text.
+- Advances the `progress_bar` by `progress_step`.
+- Enables/disables the `cancel_button`.
+- `root.update_idletasks()` refreshes the UI to reflect changes without freezing.
 
-- **update_ui**: This function updates the UI elements with new information (like progress or messages). It allows non-blocking updates while the conversion is happening.
-  - `label_text`: Changes the text of the progress label.
-  - `progress_step`: Advances the progress bar by a specific step.
-  - `cancel_state`: Updates the state of the cancel button (enabled or disabled).
-  - `root.update_idletasks()`: Refreshes the GUI without blocking it.
-
----
-
-### File Conversion Function:
-
+### File Conversion Function
 ```python
 def convert_file(input_path, output_path):
     global cancel_flag
     try:
-        update_ui("Converting... Please wait.", 5, tk.NORMAL)  # Update UI to show conversion in progress
+        update_ui("Converting... Please wait.", 5, tk.NORMAL)
 
         process = ffmpeg.input(input_path).output(output_path).global_args('-progress', 'pipe:1', '-nostats')
-        process = process.run_async(pipe_stderr=True)  # Run the ffmpeg conversion process asynchronously
+        process = process.run_async(pipe_stderr=True)
 
-        while process.poll() is None:  # Check if the process is still running
+        while process.poll() is None:
             if cancel_flag:
-                process.terminate()  # Terminate the process if cancellation is requested
-                update_ui("Conversion cancelled.", 0, tk.DISABLED)  # Update UI to show cancellation
+                process.terminate()
+                update_ui("Conversion cancelled.", 0, tk.DISABLED)
                 return
-            update_ui("Converting... Please wait.", 5, tk.NORMAL)  # Update UI during conversion
+            update_ui("Converting... Please wait.", 5, tk.NORMAL)
 
-        process.wait()  # Wait for the process to complete
+        process.wait()
 
-        if process.returncode == 0:  # If conversion was successful
-            update_ui("Conversion completed successfully!", 0, tk.DISABLED)  # Show success message
+        if process.returncode == 0:
+            update_ui("Conversion completed successfully!", 0, tk.DISABLED)
             messagebox.showinfo("Success", f"File converted to {os.path.splitext(output_path)[1][1:].upper()}!")
         else:
-            raise Exception("Conversion failed.")  # Raise an error if conversion failed
+            raise Exception("Conversion failed.")
     except Exception as e:
-        messagebox.showerror("Error", f"Error during conversion: {str(e)}")  # Show an error message in case of failure
+        messagebox.showerror("Error", f"Error during conversion: {str(e)}")
     finally:
-        cancel_button.config(state=tk.DISABLED)  # Disable the cancel button once the process ends
-        progress_bar.stop()  # Stop the progress bar after conversion
+        cancel_button.config(state=tk.DISABLED)
+        progress_bar.stop()
 ```
+The `convert_file` function performs the conversion:
+1. Updates UI to indicate the conversion is starting.
+2. Initiates the FFmpeg process using asynchronous execution with `run_async()`.
+3. Checks if `cancel_flag` is `True`, terminating the process if requested.
+4. If conversion completes successfully, it updates the UI and shows a success message.
+5. If an error occurs, it shows an error message.
+6. Finally, it disables the cancel button and stops the progress bar.
 
-- **convert_file**: Handles the file conversion using the `ffmpeg` library. This function is executed in a separate thread.
-  - `input_path`: Path of the input file to convert.
-  - `output_path`: Path where the converted file will be saved.
-  - The function updates the UI with the current state (converting, success, failure, or cancellation).
-  - It runs `ffmpeg` asynchronously (non-blocking) and checks for cancellation by periodically checking the `cancel_flag`.
-  - If the process finishes successfully, it shows a success message. If there’s an error or if conversion is cancelled, it displays an error or cancellation message.
-
----
-
-### File Selection Functions:
-
+### Input File Selection
 ```python
 def select_file():
     file_path = filedialog.askopenfilename(title="Select File", filetypes=[("All Files", "*.*")])
     if file_path:
-        input_entry.delete(0, tk.END)  # Clear any existing text in the input entry
-        input_entry.insert(0, file_path)  # Insert the selected file path
+        input_entry.delete(0, tk.END)
+        input_entry.insert(0, file_path)
 ```
+The `select_file` function opens a file dialog for the user to select an input file. It then updates `input_entry` with the selected file path.
 
-- **select_file**: Opens a file dialog to select the input file for conversion. The selected file path is inserted into the `input_entry` field.
-
+### Output File Path Selection
 ```python
 def select_save_path():
-    output_format = format_var.get().lower()  # Get the selected output format (lowercased)
+    output_format = format_var.get().lower()
     save_path = filedialog.asksaveasfilename(
         title="Select Save Path", 
-        defaultextension=f".{output_format}",  # Set the default file extension based on the selected format
+        defaultextension=f".{output_format}",
         filetypes=[(f"{output_format.upper()} files", f"*.{output_format}")]
     )
     if save_path:
-        output_entry.delete(0, tk.END)  # Clear any existing text in the output entry
-        output_entry.insert(0, save_path)  # Insert the selected save path
+        output_entry.delete(0, tk.END)
+        output_entry.insert(0, save_path)
 ```
+The `select_save_path` function opens a dialog to specify where to save the converted file, using the selected format's extension. The `output_entry` is then updated with the save path.
 
-- **select_save_path**: Opens a save file dialog to choose the location and file format for the output. The default extension is set based on the selected format (e.g., `.mp4`, `.mp3`).
-
----
-
-### Start Conversion:
-
+### Starting the Conversion in a New Thread
 ```python
 def start_conversion():
     global cancel_flag, conversion_thread
-    input_path = input_entry.get()  # Get the input file path from the entry field
-    output_path = output_entry.get()  # Get the output file path from the entry field
+    input_path = input_entry.get()
+    output_path = output_entry.get()
 
-    if not input_path or not output_path:  # If either input or output path is missing
+    if not input_path or not output_path:
         messagebox.showwarning("Input Missing", "Please specify both input and output paths.")
         return
 
-    if not os.path.exists(input_path):  # If input file does not exist
+    if not os.path.exists(input_path):
         messagebox.showerror("File Not Found", "Input file not found.")
         return
 
-    cancel_flag = False  # Reset the cancel flag to false before starting
-    progress_bar.start()  # Start the progress bar
+    cancel_flag = False
+    progress_bar.start()
 
-    conversion_thread = threading.Thread(target=convert_file, args=(input_path, output_path))  # Create a new thread for conversion
-    conversion_thread.start()  # Start the conversion thread
+    conversion_thread = threading.Thread(target=convert_file, args=(input_path, output_path))
+    conversion_thread.start()
 ```
+`start_conversion` checks for missing input or output paths, verifies the input file exists, and resets `cancel_flag`. It starts the progress bar and runs `convert_file` in a new thread to keep the UI responsive.
 
-- **start_conversion**: Starts the conversion process.
-  - Checks if both input and output paths are specified.
-  - Validates that the input file exists.
-  - Resets the `cancel_flag` and starts the progress bar.
-  - Runs the conversion in a new thread using the `convert_file` function to prevent blocking the UI.
-
----
-
-### Cancel Conversion:
-
+### Cancelling the Conversion
 ```python
 def cancel_conversion():
     global cancel_flag
-    cancel_flag = True  # Set the flag to true to cancel the process
+    cancel_flag = True
 ```
+This function sets `cancel_flag` to `True`, allowing `convert_file` to terminate the conversion process.
 
-- **cancel_conversion**: Sets the `cancel_flag` to `True`, signaling that the conversion process should stop.
-
----
-
-### Exit Application:
-
+### Exiting the Application
 ```python
 def exit_application():
-    root.quit()  # Exit the Tkinter main loop
-    root.destroy()  # Destroy the Tkinter window
+    root.quit()
+    root.destroy()
 ```
+This function closes the Tkinter window and exits the application.
 
-- **exit_application**: Closes the Tkinter application by quitting the main loop and destroying the window.
-
----
-
-### Get Supported Formats:
-
+### Supported Formats
 ```python
 def get_supported_formats():
-    return [
-        "MP4", "MP3", "GIF", "AVI", "MOV", "WAV", "FLV", "MKV", "WEBM", "AAC", "OGG"
-    ]  # List of supported file formats for conversion
+    return ["MP4", "MP3", "GIF", "AVI", "MOV", "WAV", "FLV", "MKV", "WEBM", "AAC", "OGG"]
 ```
+This function returns a list of supported output formats.
 
-- **get_supported_formats**: Returns a list of file formats supported for conversion (e.g., MP4, MP3, etc.).
-
----
-
-### GUI Setup:
-
+### Setting Up the GUI
 ```python
-root = tk.Tk()  # Initialize the Tkinter window
-root.title("Advanced File Converter")  # Set the title of the window
-root.geometry("450x550")  # Set the dimensions of the window
+root = tk.Tk()
+root.title("Advanced File Converter")
+root.geometry("450x550")
 ```
+Initializes the Tkinter window, sets the title, and dimensions.
 
-- **GUI Setup**: Initializes the main Tkinter window with the title "Advanced File Converter" and sets the size of the window.
-
----
-
-The following lines set up the rest of the graphical user interface (UI), including the file selection buttons, format selection dropdown, progress bar, labels, and buttons for starting the conversion, canceling, and exiting the application. Each widget is added to the window using `pack()` to position them.
-
-### Tkinter Main Loop:
-
+### Input File Selection UI
 ```python
-root.mainloop()  # Start the Tkinter application loop
+tk.Label(root, text="Select Input File:").pack(pady=5)
+input_entry = tk.Entry(root, width=50)
+input_entry.pack(pady=5)
+tk.Button(root, text="Choose File", command=select_file).pack(pady=5)
 ```
+Creates the UI components for selecting an input file, including a label, entry field, and a button.
 
-- **root.mainloop()**: Starts the Tkinter event loop, which keeps the window open and responsive to user interactions (like button clicks).
+### Output Format Selection UI
+```python
+tk.Label(root, text="Select Output Format:").pack(pady=5)
+format_var = tk.StringVar(value="MP4")
+output_formats = get_supported_formats()
+format_menu = tk.OptionMenu(root, format_var, *output_formats)
+format_menu.pack(pady=5)
+```
+Sets up a dropdown menu for output formats.
 
----
+### Output File Path Selection UI
+```python
+tk.Label(root, text="Save Path:").pack(pady=5)
+output_entry = tk.Entry(root, width=50)
+output_entry.pack(pady=5)
+tk.Button(root, text="Choose Save Path", command=select_save_path).pack(pady=5)
+```
+Sets up the output file path selection UI with a label, entry field, and button.
+
+### Convert and Cancel Buttons
+```python
+convert_button = tk.Button(root, text="Convert", command=start_conversion, bg="green", fg="white")
+convert_button.pack(pady=20)
+
+cancel_button = tk.Button(root, text="Cancel", command=cancel_conversion, bg="red", fg="white", state=tk.DISABLED)
+cancel_button.pack(pady=5)
+```
+Creates `Convert` and `Cancel` buttons with color customization.
+
+### Progress Bar and Label
+```python
+progress_bar = ttk.Progressbar(root, mode="indeterminate", length=300)
+progress_bar.pack(pady=10)
+
+progress_label = tk.Label(root, text="")
+progress_label.pack(pady=5)
+```
+Adds a progress bar and a label for real-time conversion updates.
+
+### Exit Button and Main Loop
+```python
+exit_button = tk.Button(root, text="Exit", command=exit_application, bg="gray", fg="white")
+exit_button.pack(pady=20)
+
+root.mainloop()
+```
+Creates an `Exit` button and starts the Tkinter main loop to run the application.
